@@ -1,5 +1,5 @@
-import { schema, CustomMessages } from '@ioc:Adonis/Core/Validator'
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema, CustomMessages } from "@ioc:Adonis/Core/Validator";
+import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 
 export default class CreateUpdateCategoryValidator {
   constructor(protected ctx: HttpContextContract) {}
@@ -23,7 +23,9 @@ export default class CreateUpdateCategoryValidator {
    *     ])
    *    ```
    */
-  public schema = schema.create({})
+  public schema = schema.create({
+    nama: schema.string(),
+  });
 
   /**
    * Custom messages for validation failures. You can make use of dot notation `(.)`
@@ -36,5 +38,7 @@ export default class CreateUpdateCategoryValidator {
    * }
    *
    */
-  public messages: CustomMessages = {}
+  public messages: CustomMessages = {
+    required: "nama kategori wajib diisi",
+  };
 }

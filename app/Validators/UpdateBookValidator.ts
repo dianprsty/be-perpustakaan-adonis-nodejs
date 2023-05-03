@@ -1,5 +1,5 @@
-import { schema, CustomMessages } from '@ioc:Adonis/Core/Validator'
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { schema, CustomMessages, rules } from "@ioc:Adonis/Core/Validator";
+import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 
 export default class UpdateBookValidator {
   constructor(protected ctx: HttpContextContract) {}
@@ -23,7 +23,18 @@ export default class UpdateBookValidator {
    *     ])
    *    ```
    */
-  public schema = schema.create({})
+  public schema = schema.create({
+    judul: schema.string.optional(),
+    ringkasan: schema.string.optional(),
+    tahun_terbit: schema.string.optional([
+      rules.maxLength(4),
+      rules.regex(/^(\d{1,3}|1\d{3}|20[01]\d|202[0-3])$/),
+    ]),
+    halaman: schema.number.optional(),
+    kategori_id: schema.number.optional([
+      rules.exists({ table: "categories", column: "id" }),
+    ]),
+  });
 
   /**
    * Custom messages for validation failures. You can make use of dot notation `(.)`
@@ -36,5 +47,9 @@ export default class UpdateBookValidator {
    * }
    *
    */
-  public messages: CustomMessages = {}
+  public messages: CustomMessages = {
+    maxLength: "tahun terbit harus berupa tahun yang valid",
+    regex: "tahun terbit maksimal 2023",
+    exists: "kategori_id tidak ditemukan",
+  };
 }

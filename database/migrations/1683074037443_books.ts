@@ -1,21 +1,26 @@
-import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import BaseSchema from "@ioc:Adonis/Lucid/Schema";
 
 export default class extends BaseSchema {
-  protected tableName = 'books'
+  protected tableName = "books";
 
-  public async up () {
+  public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
+      table.increments("id");
+      table.string("judul");
+      table.text("ringkasan", "longtext");
+      table.string("tahun_terbit", 4);
+      table.integer("halaman");
+      table.integer("category_id").unsigned();
+      table.foreign("category_id").references("categories.id");
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
-    })
+      table.timestamps(true, true);
+    });
   }
 
-  public async down () {
-    this.schema.dropTable(this.tableName)
+  public async down() {
+    this.schema.dropTable(this.tableName);
   }
 }
