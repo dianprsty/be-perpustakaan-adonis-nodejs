@@ -42,6 +42,7 @@ Route.group(() => {
   Route.group(() => {
     Route.post("register/user", "AuthController.register");
     Route.post("register/petugas", "AuthController.register");
+    Route.post("otp-confirmation", "AuthController.otpConfirmation");
     Route.post("login", "AuthController.login");
     Route.get("logout", "AuthController.logout");
   }).prefix("auth");

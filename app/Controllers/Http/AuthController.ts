@@ -1,5 +1,8 @@
+import Mail from "@ioc:Adonis/Addons/Mail";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import Otp from "App/Models/Otp";
 import User from "App/Models/User";
+import InputOtpConfirmationValidator from "App/Validators/InputOtpConfirmationValidator";
 import LoginValidator from "App/Validators/LoginValidator";
 import RegisterValidator from "App/Validators/RegisterValidator";
 
@@ -11,15 +14,31 @@ export default class AuthController {
     const role = arrUrl[arrUrl.length - 1];
 
     try {
-      await User.create({
+      const user = await User.create({
         nama: payload.nama,
         email: payload.email,
         password: payload.password,
         role,
       });
+
+      const otp = Math.round(Math.random() * 1000000);
+
+      if (user) {
+        await Otp.create({ otp, userId: user.id });
+      }
+
+      await Mail.sendLater((message) => {
+        message
+          .from("perpus@mail.co")
+          .to(payload.email)
+          .subject("Welcome Onboard!")
+          .htmlView("emails/otp_verification", { otp });
+      });
+
       return response.ok({
-        message: "registrasi berhasil",
-        data: { nama: payload.nama, email: payload.email, role },
+        message: "registrasi berhasil, silakan verifikasi email anda",
+        data: { nama: payload.nama, email: payload.email, role, otp },
+        note: "pada project kali ini otp juga dikirim ke response supaya user dapat melakukan verifikasi otp, karena send otp ke email baru bisa dilakukan di sanbox mailtrap",
       });
     } catch (error) {
       return response.badGateway({
@@ -33,6 +52,13 @@ export default class AuthController {
     const payload = await request.validate(LoginValidator);
 
     try {
+      const user = await User.findBy("email", payload.email);
+
+      if (!user?.isVerified) {
+        return response.unauthorized({
+          message: "email belum diverifikasi",
+        });
+      }
       let token = await auth
         .use("api")
         .attempt(payload.email, payload.password, { expiresIn: "7 days" });
@@ -53,5 +79,37 @@ export default class AuthController {
     return response.ok({
       message: "berhasil logout",
     });
+  }
+
+  public async otpConfirmation({ request, response }: HttpContextContract) {
+    const payload = await request.validate(InputOtpConfirmationValidator);
+
+    try {
+      const user = await User.findBy("email", payload.email);
+      const otp = await Otp.findBy("user_id", user?.id);
+
+      if (!(user && otp)) {
+        return response.badGateway({
+          message: "gagal verifikasi akun",
+        });
+      }
+
+      if (otp.otp === payload.otp) {
+        user.isVerified = true;
+        user.save();
+        return response.ok({
+          message: "berhasil verifikasi akun",
+        });
+      } else {
+        return response.badRequest({
+          message: "otp yang dimasukan salah",
+        });
+      }
+    } catch (error) {
+      return response.badGateway({
+        message: "gagal verifikasi akun",
+        errors: error,
+      });
+    }
   }
 }
