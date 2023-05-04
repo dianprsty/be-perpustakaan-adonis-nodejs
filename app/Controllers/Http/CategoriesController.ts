@@ -1,4 +1,5 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import Book from "App/Models/Book";
 import Category from "App/Models/Category";
 import CreateUpdateCategoryValidator from "App/Validators/CreateUpdateCategoryValidator";
 import { DateTime } from "luxon";
@@ -55,18 +56,21 @@ export default class CategoriesController {
       const category = await Category.findOrFail(params.id);
 
       if (category) {
+        const books = await Book.query().where("kategori_id", params.id);
         return response.ok({
           message: "berhasil mengambil data kategori",
-          data: category,
+          data: { ...category.$attributes, books },
+        });
+      }
+    } catch (error) {
+      if (Object.keys(error).length === 0) {
+        return response.notFound({
+          message: `kategori dengan id ${params.id} tidak ditemukan`,
         });
       }
 
       return response.notFound({
-        message: `kategori dengan id ${params.id} tidak ditemukan`,
-      });
-    } catch (error) {
-      return response.notFound({
-        message: `gagal mengambil data kategori`,
+        message: "gagal mengambil data kategori",
         errors: error,
       });
     }
@@ -86,10 +90,12 @@ export default class CategoriesController {
           data: category,
         });
       }
-      return response.notFound({
-        message: `kategori dengan id ${params.id} tidak ditemukan`,
-      });
     } catch (error) {
+      if (Object.keys(error).length === 0) {
+        return response.notFound({
+          message: `kategori dengan id ${params.id} tidak ditemukan`,
+        });
+      }
       return response.badGateway({
         message: "gagal update data kategori",
         errors: error,
@@ -107,13 +113,14 @@ export default class CategoriesController {
           message: `berhasil menghapus kategori ${category.nama}`,
         });
       }
-
-      return response.notFound({
-        message: `kategori dengan id ${params.id} tidak ditemukan`,
-      });
     } catch (error) {
+      if (Object.keys(error).length === 0) {
+        return response.notFound({
+          message: `kategori dengan id ${params.id} tidak ditemukan`,
+        });
+      }
       return response.badGateway({
-        message: `gagal menghapus data id`,
+        message: `gagal menghapus data kategori`,
         error: error,
       });
     }

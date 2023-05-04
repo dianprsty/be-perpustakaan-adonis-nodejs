@@ -10,8 +10,8 @@ export default class extends BaseSchema {
       table.text("ringkasan", "longtext");
       table.string("tahun_terbit", 4);
       table.integer("halaman");
-      table.integer("category_id").unsigned();
-      table.foreign("category_id").references("categories.id");
+      table.integer("kategori_id").unsigned();
+      table.foreign("kategori_id").references("categories.id");
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
