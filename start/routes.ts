@@ -25,6 +25,24 @@ Route.get("/", async () => {
 });
 
 Route.group(() => {
-  Route.resource("kategori", "CategoriesController").apiOnly();
-  Route.resource("buku", "BooksController").apiOnly();
+  Route.resource("kategori", "CategoriesController")
+    .apiOnly()
+    .middleware({
+      update: ["auth"],
+      store: ["auth"],
+      destroy: ["auth"],
+    });
+  Route.resource("buku", "BooksController")
+    .apiOnly()
+    .middleware({
+      update: ["auth"],
+      store: ["auth"],
+      destroy: ["auth"],
+    });
+  Route.group(() => {
+    Route.post("register/user", "AuthController.register");
+    Route.post("register/petugas", "AuthController.register");
+    Route.post("login", "AuthController.login");
+    Route.get("logout", "AuthController.logout");
+  }).prefix("auth");
 }).prefix("api/v1");
