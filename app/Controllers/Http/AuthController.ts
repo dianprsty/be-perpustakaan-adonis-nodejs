@@ -1,8 +1,10 @@
 import Mail from "@ioc:Adonis/Addons/Mail";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Otp from "App/Models/Otp";
+import Profile from "App/Models/Profile";
 import User from "App/Models/User";
 import InputOtpConfirmationValidator from "App/Validators/InputOtpConfirmationValidator";
+import InputProfileValidator from "App/Validators/InputProfileValidator";
 import LoginValidator from "App/Validators/LoginValidator";
 import RegisterValidator from "App/Validators/RegisterValidator";
 
@@ -21,7 +23,11 @@ export default class AuthController {
         role,
       });
 
-      const otp = Math.round(Math.random() * 1000000);
+      let otp = 0;
+
+      while (otp < 100000) {
+        otp = Math.ceil(Math.random() * 1000000);
+      }
 
       if (user) {
         await Otp.create({ otp, userId: user.id });
@@ -108,6 +114,29 @@ export default class AuthController {
     } catch (error) {
       return response.badGateway({
         message: "gagal verifikasi akun",
+        errors: error,
+      });
+    }
+  }
+
+  public async profile({ request, response, auth }: HttpContextContract) {
+    if (!auth.user) {
+      return response.unauthorized({
+        message: "login diperlukan untuk mengubah profile",
+      });
+    }
+    const payload = await request.validate(InputProfileValidator);
+
+    try {
+      const searchPayload = { userId: auth.user.id };
+      await Profile.updateOrCreate(searchPayload, payload);
+
+      return response.ok({
+        message: "berhasil mengubah data profile",
+      });
+    } catch (error) {
+      return response.badGateway({
+        message: "gagal mengubah data profile",
         errors: error,
       });
     }

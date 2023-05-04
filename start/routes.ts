@@ -45,5 +45,6 @@ Route.group(() => {
     Route.post("otp-confirmation", "AuthController.otpConfirmation");
     Route.post("login", "AuthController.login");
     Route.get("logout", "AuthController.logout");
+    Route.post("profile", "AuthController.profile").middleware("auth");
   }).prefix("auth");
 }).prefix("api/v1");
