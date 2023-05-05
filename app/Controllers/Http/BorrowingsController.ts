@@ -129,6 +129,10 @@ export default class BorrowingsController {
           },
         });
       }
+
+      return response.badGateway({
+        message: "gagal meminjam buku",
+      });
     } catch (error) {
       return response.badGateway({
         message: "gagal meminjam buku",
@@ -176,6 +180,10 @@ export default class BorrowingsController {
           },
         });
       }
+
+      return response.notFound({
+        message: `gagal mengembalikan buku`,
+      });
     } catch (error) {
       return response.badGateway({
         message: "gagal mengembalikan buku",

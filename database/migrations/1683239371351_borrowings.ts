@@ -7,7 +7,7 @@ export default class extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments("id");
-      table.date("tanggal_pinjam").defaultTo(this.now());
+      table.date("tanggal_pinjam").defaultTo(DateTime.local());
       table
         .date("tanggal_kembali")
         .defaultTo(DateTime.local().plus({ days: 7 }));

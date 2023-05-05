@@ -58,13 +58,6 @@ export default class AuthController {
     const payload = await request.validate(LoginValidator);
 
     try {
-      const user = await User.findBy("email", payload.email);
-
-      if (!user?.isVerified) {
-        return response.unauthorized({
-          message: "email belum diverifikasi",
-        });
-      }
       let token = await auth
         .use("api")
         .attempt(payload.email, payload.password, { expiresIn: "7 days" });

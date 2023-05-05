@@ -28,24 +28,24 @@ Route.group(() => {
   Route.resource("kategori", "CategoriesController")
     .apiOnly()
     .middleware({
-      update: ["auth"],
-      store: ["auth"],
-      destroy: ["auth"],
+      update: ["auth", "check_petugas"],
+      store: ["auth", "check_petugas"],
+      destroy: ["auth", "check_petugas"],
     });
 
   Route.resource("buku", "BooksController")
     .apiOnly()
     .middleware({
-      update: ["auth"],
-      store: ["auth"],
-      destroy: ["auth"],
+      update: ["auth", "check_petugas"],
+      store: ["auth", "check_petugas"],
+      destroy: ["auth", "check_petugas"],
     });
 
   Route.group(() => {
     Route.post("register/user", "AuthController.register");
     Route.post("register/petugas", "AuthController.register");
     Route.post("otp-confirmation", "AuthController.otpConfirmation");
-    Route.post("login", "AuthController.login");
+    Route.post("login", "AuthController.login").middleware("verify");
     Route.get("logout", "AuthController.logout");
     Route.post("profile", "AuthController.profile").middleware("auth");
   }).prefix("auth");

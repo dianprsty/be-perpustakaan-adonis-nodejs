@@ -40,4 +40,6 @@ Server.middleware.register([() => import("@ioc:Adonis/Core/BodyParser")]);
 */
 Server.middleware.registerNamed({
   auth: () => import("App/Middleware/Auth"),
+  verify: () => import("App/Middleware/Verify"),
+  check_petugas: () => import("App/Middleware/CheckPetugas"),
 });
