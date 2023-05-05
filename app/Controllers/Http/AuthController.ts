@@ -93,6 +93,12 @@ export default class AuthController {
         });
       }
 
+      if (user.isVerified) {
+        return response.badRequest({
+          message: "akun sudah diverifikasi",
+        });
+      }
+
       if (otp.otp === payload.otp) {
         user.isVerified = true;
         user.save();
