@@ -8,7 +8,7 @@ export default class CheckPetugas {
     // code for middleware goes here. ABOVE THE NEXT CALL
     if (auth.user?.role !== "petugas") {
       return response.unauthorized({
-        messsge: "user tidak memiliki akses untuk membuat kategori",
+        messsge: "user tidak memiliki akses untuk mengakses endpoint",
       });
     }
     await next();

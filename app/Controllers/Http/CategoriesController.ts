@@ -5,12 +5,7 @@ import CreateUpdateCategoryValidator from "App/Validators/CreateUpdateCategoryVa
 import { DateTime } from "luxon";
 
 export default class CategoriesController {
-  public async store({ request, response, auth }: HttpContextContract) {
-    if (auth.user?.role !== "petugas") {
-      return response.unauthorized({
-        messsge: "user tidak memiliki akses untuk membuat kategori",
-      });
-    }
+  public async store({ request, response }: HttpContextContract) {
     const payload = await request.validate(CreateUpdateCategoryValidator);
     console.log(payload);
 
@@ -81,17 +76,7 @@ export default class CategoriesController {
     }
   }
 
-  public async update({
-    request,
-    response,
-    params,
-    auth,
-  }: HttpContextContract) {
-    if (auth.user?.role !== "petugas") {
-      return response.unauthorized({
-        messsge: "user tidak memiliki akses untuk mengubah kategori",
-      });
-    }
+  public async update({ request, response, params }: HttpContextContract) {
     const payload = await request.validate(CreateUpdateCategoryValidator);
 
     try {
@@ -118,12 +103,7 @@ export default class CategoriesController {
     }
   }
 
-  public async destroy({ response, params, auth }: HttpContextContract) {
-    if (auth.user?.role !== "petugas") {
-      return response.unauthorized({
-        messsge: "user tidak memiliki akses untuk menghapus kategori",
-      });
-    }
+  public async destroy({ response, params }: HttpContextContract) {
     try {
       const category = await Category.findOrFail(params.id);
 

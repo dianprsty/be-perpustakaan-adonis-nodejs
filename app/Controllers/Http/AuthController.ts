@@ -5,7 +5,6 @@ import Profile from "App/Models/Profile";
 import User from "App/Models/User";
 import InputOtpConfirmationValidator from "App/Validators/InputOtpConfirmationValidator";
 import InputProfileValidator from "App/Validators/InputProfileValidator";
-import LoginValidator from "App/Validators/LoginValidator";
 import OtpResendValidator from "App/Validators/OtpResendValidator";
 import RegisterValidator from "App/Validators/RegisterValidator";
 
@@ -55,8 +54,7 @@ export default class AuthController {
   }
 
   public async login({ request, response, auth }: HttpContextContract) {
-    const payload = await request.validate(LoginValidator);
-
+    const payload = request.body();
     try {
       let token = await auth
         .use("api")
@@ -95,7 +93,7 @@ export default class AuthController {
 
       if (user.isVerified) {
         return response.badRequest({
-          message: "akun sudah diverifikasi",
+          message: "akun sudah terverifikasi",
         });
       }
 
@@ -148,7 +146,7 @@ export default class AuthController {
       const user = await User.findByOrFail("email", payload.email);
       if (user.isVerified) {
         return response.unauthorized({
-          message: "email sudah terferifikasi",
+          message: "email sudah terverifikasi",
         });
       }
 
@@ -161,6 +159,7 @@ export default class AuthController {
       if (user) {
         let otpData = await Otp.findByOrFail("user_id", user.id);
         otpData.otp = otp;
+        otpData.save();
       }
 
       await Mail.sendLater((message) => {

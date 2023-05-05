@@ -31,7 +31,7 @@ export default class UpdateBookValidator {
       rules.regex(/^(\d{1,3}|1\d{3}|20[01]\d|202[0-3])$/),
     ]),
     halaman: schema.number.optional([rules.range(0, 999)]),
-    stock: schema.number([rules.range(0, 999)]),
+    stock: schema.number.optional([rules.range(0, 999)]),
     kategori_id: schema.number.optional([
       rules.exists({ table: "categories", column: "id" }),
     ]),

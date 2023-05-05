@@ -43,7 +43,7 @@ export default class OtpResendValidator {
    */
   public messages: CustomMessages = {
     required: "{{ field }} iwajib diisi",
-    field: "format {{ field }} salah",
+    email: "format {{ field }} salah",
     exists: "{{ field }} tidak terdaftar",
   };
 }

@@ -5,13 +5,7 @@ import UpdateBookValidator from "App/Validators/UpdateBookValidator";
 import { DateTime } from "luxon";
 
 export default class BooksController {
-  public async store({ request, response, auth }: HttpContextContract) {
-    if (auth.user?.role !== "petugas") {
-      return response.unauthorized({
-        messsge: "user tidak memiliki akses untuk membuat buku",
-      });
-    }
-
+  public async store({ request, response }: HttpContextContract) {
     const payload = await request.validate(CreateBookValidator);
 
     try {
@@ -80,18 +74,7 @@ export default class BooksController {
     }
   }
 
-  public async update({
-    request,
-    response,
-    params,
-    auth,
-  }: HttpContextContract) {
-    if (auth.user?.role !== "petugas") {
-      return response.unauthorized({
-        messsge: "user tidak memiliki akses untuk membuat buku",
-      });
-    }
-
+  public async update({ request, response, params }: HttpContextContract) {
     const payload = await request.validate(UpdateBookValidator);
 
     try {
@@ -116,12 +99,7 @@ export default class BooksController {
     }
   }
 
-  public async destroy({ response, params, auth }: HttpContextContract) {
-    if (auth.user?.role !== "petugas") {
-      return response.unauthorized({
-        messsge: "user tidak memiliki akses untuk membuat buku",
-      });
-    }
+  public async destroy({ response, params }: HttpContextContract) {
     try {
       const book = await Book.findOrFail(params.id);
 
