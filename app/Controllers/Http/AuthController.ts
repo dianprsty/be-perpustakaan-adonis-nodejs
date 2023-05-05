@@ -6,6 +6,7 @@ import User from "App/Models/User";
 import InputOtpConfirmationValidator from "App/Validators/InputOtpConfirmationValidator";
 import InputProfileValidator from "App/Validators/InputProfileValidator";
 import LoginValidator from "App/Validators/LoginValidator";
+import OtpResendValidator from "App/Validators/OtpResendValidator";
 import RegisterValidator from "App/Validators/RegisterValidator";
 
 export default class AuthController {
@@ -43,8 +44,7 @@ export default class AuthController {
 
       return response.ok({
         message: "registrasi berhasil, silakan verifikasi email anda",
-        data: { nama: payload.nama, email: payload.email, role, otp },
-        note: "pada project kali ini otp juga dikirim ke response supaya user dapat melakukan verifikasi otp, karena send otp ke email baru bisa dilakukan di sanbox mailtrap",
+        data: { nama: payload.nama, email: payload.email, role },
       });
     } catch (error) {
       return response.badGateway({
@@ -130,6 +130,48 @@ export default class AuthController {
     } catch (error) {
       return response.badGateway({
         message: "gagal mengubah data profile",
+        errors: error,
+      });
+    }
+  }
+
+  public async otpResend({ request, response }: HttpContextContract) {
+    const payload = await request.validate(OtpResendValidator);
+
+    try {
+      const user = await User.findByOrFail("email", payload.email);
+      if (user.isVerified) {
+        return response.unauthorized({
+          message: "email sudah terferifikasi",
+        });
+      }
+
+      let otp = 0;
+
+      while (otp < 100000) {
+        otp = Math.ceil(Math.random() * 1000000);
+      }
+
+      if (user) {
+        let otpData = await Otp.findByOrFail("user_id", user.id);
+        otpData.otp = otp;
+      }
+
+      await Mail.sendLater((message) => {
+        message
+          .from("perpus@mail.co")
+          .to(payload.email)
+          .subject("Welcome Onboard!")
+          .htmlView("emails/otp_verification", { otp });
+      });
+
+      return response.ok({
+        message: "berhasil request ulang otp",
+        data: { nama: user.nama, email: user.email, role: user.role },
+      });
+    } catch (error) {
+      return response.badGateway({
+        message: "register gagal",
         errors: error,
       });
     }
