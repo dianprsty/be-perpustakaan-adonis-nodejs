@@ -32,6 +32,7 @@ Route.group(() => {
       store: ["auth"],
       destroy: ["auth"],
     });
+
   Route.resource("buku", "BooksController")
     .apiOnly()
     .middleware({
@@ -39,6 +40,7 @@ Route.group(() => {
       store: ["auth"],
       destroy: ["auth"],
     });
+
   Route.group(() => {
     Route.post("register/user", "AuthController.register");
     Route.post("register/petugas", "AuthController.register");
@@ -47,4 +49,14 @@ Route.group(() => {
     Route.get("logout", "AuthController.logout");
     Route.post("profile", "AuthController.profile").middleware("auth");
   }).prefix("auth");
+
+  Route.get("peminjaman", "BorrowingsController.index");
+  Route.get("peminjaman/:id", "BorrowingsController.show");
+  Route.post("buku/:id/peminjaman", "BorrowingsController.store").middleware(
+    "auth"
+  );
+  Route.get(
+    "buku/:id/pengembalian",
+    "BorrowingsController.returnBook"
+  ).middleware("auth");
 }).prefix("api/v1");

@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
-import { BaseModel, column } from "@ioc:Adonis/Lucid/Orm";
+import { BaseModel, HasMany, column, hasMany } from "@ioc:Adonis/Lucid/Orm";
+import Borrowing from "./Borrowing";
 
 export default class Book extends BaseModel {
   @column({ isPrimary: true })
@@ -18,6 +19,9 @@ export default class Book extends BaseModel {
   public halaman: number;
 
   @column()
+  public stock: number;
+
+  @column()
   public kategori_id: number;
 
   @column.dateTime({ autoCreate: true })
@@ -25,4 +29,7 @@ export default class Book extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime;
+
+  @hasMany(() => Borrowing)
+  public borrows: HasMany<typeof Borrowing>;
 }

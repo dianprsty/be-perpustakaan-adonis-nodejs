@@ -1,7 +1,7 @@
 import { schema, CustomMessages, rules } from "@ioc:Adonis/Core/Validator";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 
-export default class UpdateBookValidator {
+export default class InputBorrowingValidator {
   constructor(protected ctx: HttpContextContract) {}
 
   /*
@@ -24,16 +24,11 @@ export default class UpdateBookValidator {
    *    ```
    */
   public schema = schema.create({
-    judul: schema.string.optional(),
-    ringkasan: schema.string.optional(),
-    tahun_terbit: schema.string.optional([
-      rules.maxLength(4),
-      rules.regex(/^(\d{1,3}|1\d{3}|20[01]\d|202[0-3])$/),
+    tanggal_pinjam: schema.string.optional([
+      rules.regex(/^20[0-9][0-9]-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/),
     ]),
-    halaman: schema.number.optional([rules.range(0, 999)]),
-    stock: schema.number([rules.range(0, 999)]),
-    kategori_id: schema.number.optional([
-      rules.exists({ table: "categories", column: "id" }),
+    tanggal_kembali: schema.string.optional([
+      rules.regex(/^20[0-9][0-9]-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/),
     ]),
   });
 
@@ -49,8 +44,6 @@ export default class UpdateBookValidator {
    *
    */
   public messages: CustomMessages = {
-    maxLength: "tahun terbit harus berupa tahun yang valid",
-    regex: "tahun terbit maksimal 2023",
-    exists: "kategori_id tidak ditemukan",
+    regex: "format {{ field }} harus YYYY-MM-DD",
   };
 }

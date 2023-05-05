@@ -30,7 +30,8 @@ export default class CreateBookValidator {
       rules.maxLength(4),
       rules.regex(/^(\d{1,3}|1\d{3}|20[01]\d|202[0-3])$/),
     ]),
-    halaman: schema.number(),
+    halaman: schema.number([rules.range(0, 9999)]),
+    stock: schema.number([rules.range(0, 999)]),
     kategori_id: schema.number([
       rules.exists({ table: "categories", column: "id" }),
     ]),

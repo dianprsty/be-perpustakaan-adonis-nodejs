@@ -40,17 +40,17 @@ export default class CategoriesController {
 
       if (categories) {
         return response.ok({
-          message: "berhasil mengambil data buku",
+          message: "berhasil mengambil data kategori",
           data: categories,
         });
       }
 
       return response.badGateway({
-        message: "gagal mengambil data buku",
+        message: "gagal mengambil data kategori",
       });
     } catch (error) {
       return response.badGateway({
-        message: "gagal mengambil data buku",
+        message: "gagal mengambil data kategori",
         errors: error,
       });
     }

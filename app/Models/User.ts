@@ -6,8 +6,11 @@ import {
   BaseModel,
   hasOne,
   HasOne,
+  hasMany,
+  HasMany,
 } from "@ioc:Adonis/Lucid/Orm";
 import Profile from "./Profile";
+import Borrowing from "./Borrowing";
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -46,4 +49,7 @@ export default class User extends BaseModel {
 
   @hasOne(() => Profile)
   public profile: HasOne<typeof Profile>;
+
+  @hasMany(() => Borrowing)
+  public borrows: HasMany<typeof Borrowing>;
 }
