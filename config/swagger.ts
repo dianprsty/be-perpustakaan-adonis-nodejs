@@ -14,7 +14,8 @@ export default {
       info: {
         title: "API Documentation Aplikasi Perpustakaan",
         version: "1.0.0",
-        description: "API Perpustakaan yang dibuat menggunakan adonisjs",
+        description:
+          "API Perpustakaan yang dibuat menggunakan adonisjs dibuat oleh Dian Prasetyo dalam rangka memenuhi project  akhir bootcamp node js with adonis di sanbercode",
       },
       components: {
         securitySchemes: {

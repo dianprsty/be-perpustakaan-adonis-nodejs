@@ -2,13 +2,14 @@
 
 Bootcamp Digital Skill Sanbercode Batch 44
 
+- Nama Project : API Perpustakaan AdonisJS Sanbercode Batch 44
 
--	Nama Project : API Perpustakaan AdonisJS Sanbercode Batch 44
+- Nama Pembuat project (author) : Dian Prasetyo
 
--	Nama Pembuat project (author) : Dian Prasetyo
+- Email : dprasmail@gmail.com
 
--	Email : dprasmail@gmail.com
+- Link Deploy :
 
--	Link Deploy :
+- Contoh User : -
 
--	Contoh User : -
+![My Image](dokumentasi.png)
