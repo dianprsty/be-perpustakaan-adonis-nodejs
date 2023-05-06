@@ -320,4 +320,133 @@ export default class BorrowingsController {
       });
     }
   }
+
+  /**
+   * @swagger
+   * /api/v1/peminjaman/{id}:
+   *   put:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Peminjaman
+   *     summary: Update Peminjaman
+   *     description: Mengupdate data Peminjaman
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID Peminjaman
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputBorrowing'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
+  public async update({ request, response, params }: HttpContextContract) {
+    const payload = await request.validate(InputBorrowingValidator);
+
+    try {
+      const borrowing = await Borrowing.findOrFail(params.id);
+      if (borrowing) {
+        if (payload.tanggal_pinjam) {
+          let tanggalPinjam = new Date(payload.tanggal_pinjam);
+          borrowing.tanggalPinjam =
+            DateTime.fromJSDate(tanggalPinjam).toSQLDate();
+        }
+
+        if (payload.tanggal_kembali) {
+          let tanggalKembali = new Date(payload.tanggal_kembali);
+          borrowing.tanggalKembali =
+            DateTime.fromJSDate(tanggalKembali).toSQLDate();
+        }
+        borrowing.updatedAt = DateTime.local();
+        borrowing.save();
+        return response.ok({
+          message: "berhasil update kategori",
+          data: borrowing,
+        });
+      }
+    } catch (error) {
+      if (Object.keys(error).length === 0) {
+        return response.notFound({
+          message: `kategori dengan id ${params.id} tidak ditemukan`,
+        });
+      }
+      return response.badGateway({
+        message: "gagal update data kategori",
+        errors: error,
+      });
+    }
+  }
+
+  /**
+   * @swagger
+   * /api/v1/peminjaman/{id}:
+   *   delete:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Peminjaman
+   *     summary: Delete Peminjaman
+   *     description: Menghapus peminjaman berdasarkan id
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID peminjaman
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
+  public async destroy({ response, params }: HttpContextContract) {
+    try {
+      const borrowing = await Borrowing.findOrFail(params.id);
+
+      if (borrowing) {
+        await borrowing.delete();
+        return response.ok({
+          message: `berhasil menghapus data peminjaman}`,
+        });
+      }
+    } catch (error) {
+      if (Object.keys(error).length === 0) {
+        return response.notFound({
+          message: `peminjaman dengan id ${params.id} tidak ditemukan`,
+        });
+      }
+      return response.badGateway({
+        message: `gagal menghapus data kategori`,
+        error: error,
+      });
+    }
+  }
 }
