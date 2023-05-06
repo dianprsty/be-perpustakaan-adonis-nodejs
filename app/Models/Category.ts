@@ -2,6 +2,25 @@ import { DateTime } from "luxon";
 import { BaseModel, HasMany, column, hasMany } from "@ioc:Adonis/Lucid/Orm";
 import Book from "./Book";
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      Category:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: number
+ *          nama:
+ *            type: string
+ *          createdAt:
+ *            type: string
+ *          updatedAt:
+ *            type: string
+ *          books:
+ *            type: array
+ *
+ */
 export default class Category extends BaseModel {
   @column({ isPrimary: true })
   public id: number;

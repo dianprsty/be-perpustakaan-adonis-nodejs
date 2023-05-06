@@ -12,6 +12,35 @@ import {
 import Profile from "./Profile";
 import Borrowing from "./Borrowing";
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      User:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: number
+ *          name:
+ *            type: string
+ *          email:
+ *            type: string
+ *          password:
+ *            type: string
+ *          role:
+ *            type: string
+ *          isVerified:
+ *            type: boolean
+ *          createdAt:
+ *            type: string
+ *          updatedAt:
+ *            type: string
+ *          profile:
+ *            type: object
+ *          borrows:
+ *            type: array
+ *
+ */
 export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number;

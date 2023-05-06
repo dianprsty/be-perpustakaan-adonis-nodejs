@@ -1,6 +1,18 @@
 import { schema, CustomMessages } from "@ioc:Adonis/Core/Validator";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      InputProfile:
+ *        type: object
+ *        properties:
+ *          bio:
+ *            type: string
+ *          alamat:
+ *            type: string
+ */
 export default class InputProfileValidator {
   constructor(protected ctx: HttpContextContract) {}
 

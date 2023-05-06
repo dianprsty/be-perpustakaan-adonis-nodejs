@@ -5,6 +5,38 @@ import CreateUpdateCategoryValidator from "App/Validators/CreateUpdateCategoryVa
 import { DateTime } from "luxon";
 
 export default class CategoriesController {
+  /**
+   * @swagger
+   * /api/v1/kategori:
+   *   post:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Kategori
+   *     summary: Create Kategori
+   *     description: Menambah data kategori
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputCategory'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       201:
+   *         description: Created
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
   public async store({ request, response }: HttpContextContract) {
     const payload = await request.validate(CreateUpdateCategoryValidator);
     console.log(payload);
@@ -29,6 +61,27 @@ export default class CategoriesController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/kategori:
+   *   get:
+   *     tags:
+   *       - Kategori
+   *     summary: Get All Kategori
+   *     description: Mengambil semua data kategori
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
   public async index({ response }: HttpContextContract) {
     try {
       const categories = await Category.all();
@@ -51,6 +104,34 @@ export default class CategoriesController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/kategori/{id}:
+   *   get:
+   *     tags:
+   *       - Kategori
+   *     summary: Get Kategori By Id
+   *     description: Mengambil semua data kategori berdasarkan id
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID kategori
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   */
   public async show({ response, params }: HttpContextContract) {
     try {
       const category = await Category.findOrFail(params.id);
@@ -76,6 +157,45 @@ export default class CategoriesController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/kategori/{id}:
+   *   put:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Kategori
+   *     summary: Update Kategori
+   *     description: Mengupdate data kategori
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID kategori
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputCategory'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
   public async update({ request, response, params }: HttpContextContract) {
     const payload = await request.validate(CreateUpdateCategoryValidator);
 
@@ -103,6 +223,36 @@ export default class CategoriesController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/kategori/{id}:
+   *   delete:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Kategori
+   *     summary: Delete Kategori
+   *     description: Menghapus kategori berdasarkan id
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID kategori
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
   public async destroy({ response, params }: HttpContextContract) {
     try {
       const category = await Category.findOrFail(params.id);

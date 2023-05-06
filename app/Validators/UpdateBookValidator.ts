@@ -1,6 +1,26 @@
 import { schema, CustomMessages, rules } from "@ioc:Adonis/Core/Validator";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      InputBookUpdate:
+ *        type: object
+ *        properties:
+ *          judul:
+ *            type: string
+ *          ringkasan:
+ *            type: string
+ *          tahun_terbit:
+ *            type: string
+ *          halaman:
+ *            type: number
+ *          stock:
+ *            type: number
+ *          kategori_id:
+ *            type: number
+ */
 export default class UpdateBookValidator {
   constructor(protected ctx: HttpContextContract) {}
 

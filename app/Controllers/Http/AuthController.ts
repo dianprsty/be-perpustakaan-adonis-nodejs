@@ -9,6 +9,81 @@ import OtpResendValidator from "App/Validators/OtpResendValidator";
 import RegisterValidator from "App/Validators/RegisterValidator";
 
 export default class AuthController {
+  /**
+   * @swagger
+   * /api/v1/auth/register/user:
+   *  post:
+   *     tags:
+   *       - Auth
+   *     summary: Buat akun baru dengan role user
+   *     description: Register akun baru dengan Role User
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputRegister'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                    nama:
+   *                      type: string
+   *                    email:
+   *                      type: string
+   *                    role:
+   *                      type: string
+   */
+
+  /**
+   * @swagger
+   * /api/v1/auth/register/petugas:
+   *  post:
+   *     tags:
+   *       - Auth
+   *     summary: Buat akun baru dengan role petugas
+   *     description: Register akun baru dengan Role petugas
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputRegister'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                    nama:
+   *                      type: string
+   *                    email:
+   *                      type: string
+   *                    role:
+   *                      type: string
+   */
   public async register({ request, response }: HttpContextContract) {
     const payload = await request.validate(RegisterValidator);
 
@@ -53,6 +128,43 @@ export default class AuthController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/auth/login:
+   *  post:
+   *     tags:
+   *       - Auth
+   *     summary: Login dengan email yang terdaftar dan terverifikasi
+   *     description: Login mengguakan email yang sebelumnya sudah register dan sudah melakukan otp confirmation
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputLogin'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                    type:
+   *                      type: string
+   *                    token:
+   *                      type: string
+   *                    expires_at:
+   *                      type: string
+   */
   public async login({ request, response, auth }: HttpContextContract) {
     const payload = request.body();
     try {
@@ -71,6 +183,27 @@ export default class AuthController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/auth/logout:
+   *   get:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Auth
+   *     summary: Logout
+   *     description: logout menghapus akses user menggunakan token, sehingga token tidak lagi bisa digunakan untuk authorization
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   */
   public async logout({ auth, response }) {
     await auth.use("api").revoke();
     return response.ok({
@@ -78,6 +211,34 @@ export default class AuthController {
     });
   }
 
+  /**
+   * @swagger
+   * /api/v1/auth/otp-confirmation:
+   *  post:
+   *     tags:
+   *       - Auth
+   *     summary: Verifikasi user baru
+   *     description: verifikasi user yang sudah register dengan OTP yang dikirim ke email
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputOtpConfirmation'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   */
   public async otpConfirmation({ request, response }: HttpContextContract) {
     const payload = await request.validate(InputOtpConfirmationValidator);
 
@@ -116,6 +277,37 @@ export default class AuthController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/auth/profile:
+   *   post:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Auth
+   *     summary: Login dengan email yang terdaftar dan terverifikasi
+   *     description: Login mengguakan email yang sebelumnya sudah register dan sudah melakukan otp confirmation
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputProfile'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   */
+
   public async profile({ request, response, auth }: HttpContextContract) {
     if (!auth.user) {
       return response.unauthorized({
@@ -139,6 +331,34 @@ export default class AuthController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/auth/otp-resend:
+   *  post:
+   *     tags:
+   *       - Auth
+   *     summary: Kirim ulang OTP
+   *     description: Kirim ulang OTP ke email yang sudah register namun belum verifikasi
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputOtpResend'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   */
   public async otpResend({ request, response }: HttpContextContract) {
     const payload = await request.validate(OtpResendValidator);
 

@@ -1,6 +1,28 @@
 import { schema, CustomMessages, rules } from "@ioc:Adonis/Core/Validator";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *      InputRegister:
+ *        type: object
+ *        properties:
+ *          nama:
+ *            type: string
+ *          email:
+ *            type: string
+ *          password:
+ *            type: string
+ *          password_confirmation:
+ *            type: string
+ *        required:
+ *          - nama
+ *          - email
+ *          - password
+ *          - password_confirmation
+ *
+ */
 export default class RegisterValidator {
   constructor(protected ctx: HttpContextContract) {}
 

@@ -1,4 +1,5 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import Database from "@ioc:Adonis/Lucid/Database";
 import Book from "App/Models/Book";
 import Borrowing from "App/Models/Borrowing";
 import User from "App/Models/User";
@@ -6,14 +7,39 @@ import InputBorrowingValidator from "App/Validators/InputBorrowingValidator";
 import { DateTime } from "luxon";
 
 export default class BorrowingsController {
+  /**
+   * @swagger
+   * /api/v1/peminjaman:
+   *   get:
+   *     tags:
+   *       - Peminjaman
+   *     summary: Get All Peminjaman
+   *     description: Mengambil semua data Peminjaman
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
   public async index({ response }: HttpContextContract) {
     try {
       const borrows = await Borrowing.all();
 
       if (borrows) {
+        let data = await Database.rawQuery(`select borrowings.*, nama, judul 
+          from borrowings join users on borrowings.user_id=users.id 
+          join books on borrowings.book_id=books.id`);
+
         return response.ok({
           message: "berhasil mengambil data peminjaman",
-          data: borrows,
+          data: data[0],
         });
       }
 
@@ -28,6 +54,34 @@ export default class BorrowingsController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/peminjaman/{id}:
+   *   get:
+   *     tags:
+   *       - Peminjaman
+   *     summary: Get Peminjaman By Id
+   *     description: Mengambil semua data peminjaman berdasarkan id
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID peminjaman
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   */
   public async show({ response, params }: HttpContextContract) {
     try {
       const borrow = await Borrowing.findOrFail(params.id);
@@ -39,8 +93,8 @@ export default class BorrowingsController {
           message: "berhasil mengambil data peminjaman",
           data: {
             ...borrow.$attributes,
-            book,
             user: { nama: user?.nama, email: user?.email },
+            book,
           },
         });
       }
@@ -58,6 +112,45 @@ export default class BorrowingsController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/buku/{id}/peminjaman:
+   *   post:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Peminjaman
+   *     summary: Peminjaman Buku
+   *     description: User yang sudah terverifikasi melakukan peminjaman buku yang stocknya masih ada dan dia sedang tidak meminjam buku yang sama (hanya bisa meminjam 1 buku)
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID buku
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/x-www-form-urlencoded:
+   *           description: User payload
+   *           schema:
+   *             $ref: '#/components/schemas/InputBorrowing'
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   */
   public async store({ request, response, params, auth }: HttpContextContract) {
     const user = auth.user;
     const bookId = params.id;
@@ -100,21 +193,26 @@ export default class BorrowingsController {
         userId: user.id,
         bookId,
         isReturned: false,
-        tanggalPinjam: DateTime.local(),
-        tanggalKembali: DateTime.local().plus({ days: 7 }),
+        tanggalPinjam: DateTime.local().toSQLDate(),
+        tanggalKembali: DateTime.local().plus({ days: 7 }).toSQLDate(),
       };
 
       if (payload.tanggal_pinjam) {
         let tanggalPinjam = new Date(payload.tanggal_pinjam);
-        borrowInput.tanggalPinjam = DateTime.fromJSDate(tanggalPinjam);
+        borrowInput.tanggalPinjam =
+          DateTime.fromJSDate(tanggalPinjam).toSQLDate();
       }
 
       if (payload.tanggal_kembali) {
         let tanggalKembali = new Date(payload.tanggal_kembali);
-        borrowInput.tanggalKembali = DateTime.fromJSDate(tanggalKembali);
+        borrowInput.tanggalKembali =
+          DateTime.fromJSDate(tanggalKembali).toSQLDate();
       }
 
       let newBorrow = await Borrowing.create(borrowInput);
+
+      book.stock--;
+      book.save();
 
       if (newBorrow) {
         return response.created({
@@ -141,6 +239,34 @@ export default class BorrowingsController {
     }
   }
 
+  /**
+   * @swagger
+   * /api/v1/buku/{id}/pengembalian:
+   *   get:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Peminjaman
+   *     summary: Pengembalian Buku
+   *     description: User dapat mengembalikan buku yang dipinjamnya
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         schema:
+   *           type: integer
+   *         required: true
+   *         description: ID buku
+   *     responses:
+   *       200:
+   *         description: Success
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   */
   public async returnBook({ response, params, auth }: HttpContextContract) {
     const user = auth.user;
     const bookId = params.id;
@@ -168,6 +294,9 @@ export default class BorrowingsController {
         const borrowingToReturn: Borrowing = borrows[index];
         borrowingToReturn.isReturned = true;
         borrowingToReturn.save();
+        book.stock++;
+        book.save();
+
         return response.ok({
           message: "berhasil mengambalikan buku",
           data: {
@@ -182,7 +311,7 @@ export default class BorrowingsController {
       }
 
       return response.notFound({
-        message: `gagal mengembalikan buku`,
+        message: `gagal mengembalikan buku, peminjaman tidak ditemukan`,
       });
     } catch (error) {
       return response.badGateway({

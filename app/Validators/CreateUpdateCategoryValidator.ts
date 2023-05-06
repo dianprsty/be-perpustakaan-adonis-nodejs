@@ -4,6 +4,19 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 export default class CreateUpdateCategoryValidator {
   constructor(protected ctx: HttpContextContract) {}
 
+  /**
+   * @swagger
+   * components:
+   *  schemas:
+   *      InputCategory:
+   *        type: object
+   *        properties:
+   *          nama:
+   *            type: string
+   *        required:
+   *          - nama
+   *
+   */
   /*
    * Define schema to validate the "shape", "type", "formatting" and "integrity" of data.
    *
